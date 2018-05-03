@@ -1,0 +1,23 @@
+{
+  "name": "anonymous-server",
+  "version": "0.0.1",
+  "description": "anonymous-server by koa ",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf ~/lib/* && tsc",
+    "dev": "npm run build && node index.js"
+  },
+  "author": "yangger <i@yangger.cn>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.0.3",
+    "@types/socket.io": "^1.4.33",
+    "bluebird": "^3.5.1",
+    "koa": "^2.5.1",
+    "koa-router": "^7.4.0",
+    "koa-static": "^4.0.2",
+    "redis": "^2.8.0",
+    "socket.io": "^2.1.0",
+    "typescript": "^2.7.1"
+  }
+}
