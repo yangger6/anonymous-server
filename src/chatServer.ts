@@ -2,7 +2,7 @@ import { createServer, Server } from 'http'
 import * as Koa from 'koa'
 import * as socketIo from 'socket.io'
 
-export class ChatServer {
+export default class ChatServer {
     public static readonly PORT:number = 8080
     private app: Koa
     private server: Server
@@ -60,26 +60,22 @@ export class ChatServer {
                     numUsers: this.numUsers
                 });
             });
-
             // when the client emits 'typing', we broadcast it to others
             socket.on('typing', () => {
                 socket.broadcast.emit('typing', {
                     username: socket.username
                 });
             });
-
             // when the client emits 'stop typing', we broadcast it to others
             socket.on('stop typing', () => {
                 socket.broadcast.emit('stop typing', {
                     username: socket.username
                 });
             });
-
             // when the user disconnects.. perform this
             socket.on('disconnect', () => {
                 if (addedUser) {
                     --this.numUsers;
-
                     // echo globally that this client has left
                     socket.broadcast.emit('user left', {
                         username: socket.username,
@@ -88,7 +84,6 @@ export class ChatServer {
                 }
             });
         });
-
     }
     public getApp(): Koa {
         return this.app;

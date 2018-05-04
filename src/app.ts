@@ -1,7 +1,7 @@
 import router from './router/index'
 import * as serve from 'koa-static'
 import { join } from 'path'
-import { ChatServer } from './chatServer'
+import ChatServer from './chatServer'
 
 const app = new ChatServer().getApp()
 
