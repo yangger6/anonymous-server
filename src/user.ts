@@ -1,14 +1,12 @@
 import ChatServer  from './chatServer'
 import Timer = NodeJS.Timer;
-export class User {
+export default class User {
     private socket: SocketIO.Socket
-    private server: ChatServer
     private heartTimmer: Timer
     private heartTime = 60000
     public appId: string = ''
-    constructor (socket: SocketIO.Socket, server: ChatServer, appId: string) {
+    constructor (socket: SocketIO.Socket, appId: string) {
         this.socket = socket
-        this.server = server
         this.appId = appId
         this.startHeart()
     }

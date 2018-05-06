@@ -2,7 +2,7 @@ import { createServer, Server } from 'http'
 import * as Koa from 'koa'
 import * as socketIo from 'socket.io'
 import RedisServer from './redis/redisServer'
-import User from "./User";
+import User from "./user";
 export default class ChatServer {
     public static readonly PORT:number = 8080
     private app: Koa
@@ -45,7 +45,7 @@ export default class ChatServer {
             });
             socket.on('add user', (appId) => {
                 if (addedUser) return;
-                let user = new User(appId, this.redisClent, socket)
+                let user = new User(socket, appId)
                 this.userList.push(user)
                 // we store the username in the socket session for this client
                 socket.appId = appId;
