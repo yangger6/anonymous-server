@@ -2,7 +2,6 @@ import { createServer, Server } from 'http'
 import * as Koa from 'koa'
 import * as socketIo from 'socket.io'
 import RedisServer from './redis/redisServer'
-import User from "./User";
 export default class ChatServer {
     public static readonly PORT:number = 8080
     private app: Koa
@@ -10,7 +9,7 @@ export default class ChatServer {
     private io: SocketIO.Server
     private port: string | number
     private redisClent: any
-    private userList: object[] = []
+    public numUsers: number = 0
     constructor() {
         this.createApp()
         this.config()
@@ -39,23 +38,58 @@ export default class ChatServer {
             console.log('Running server on port %s', this.port);
         });
         this.io.on('connect', (socket: any) => {
-            let addedUser = false;
             console.log('Connected client on port %s.', this.port);
+            let addedUser = false;
+            // when the client emits 'new message', this listens and executes
             socket.on('new message', (data) => {
+                // we tell the client to execute 'new message'
+                socket.broadcast.emit('new message', {
+                    username: socket.username,
+                    message: data
+                });
             });
-            socket.on('add user', (appId) => {
+            // when the client emits 'add user', this listens and executes
+            socket.on('add user', (username) => {
                 if (addedUser) return;
-                let user = new User(appId, this.redisClent, socket)
-                this.userList.push(user)
+
                 // we store the username in the socket session for this client
-                socket.appId = appId;
+                socket.username = username;
+                ++this.numUsers;
                 addedUser = true;
+                socket.emit('login', {
+                    numUsers: this.numUsers
+                });
+                // echo globally (all clients) that a person has connected
+                socket.broadcast.emit('user joined', {
+                    username: socket.username,
+                    numUsers: this.numUsers
+                });
             });
+
+            // when the client emits 'typing', we broadcast it to others
             socket.on('typing', () => {
+                socket.broadcast.emit('typing', {
+                    username: socket.username
+                });
             });
+
+            // when the client emits 'stop typing', we broadcast it to others
             socket.on('stop typing', () => {
+                socket.broadcast.emit('stop typing', {
+                    username: socket.username
+                });
             });
+
+            // when the user disconnects.. perform this
             socket.on('disconnect', () => {
+                if (addedUser) {
+                    --this.numUsers;
+                    // echo globally that this client has left
+                    socket.broadcast.emit('user left', {
+                        username: socket.username,
+                        numUsers: this.numUsers
+                    });
+                }
             });
         });
 
